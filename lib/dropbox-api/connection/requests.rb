@@ -52,7 +52,7 @@ module Dropbox
           request_url = "#{Dropbox::API::Config.prefix}#{path}?#{URI.parse(URI.encode(query))}"
           request(:raw => true) do
             if token.is_a?(::OAuth2::AccessToken)
-              token(endpoint).get request_url, headers: headers
+              token(endpoint).get request_url, headers => headers
             else
               token(endpoint).get request_url, headers
             end
@@ -64,7 +64,7 @@ module Dropbox
           request_url = "#{Dropbox::API::Config.prefix}#{path}?#{URI.parse(URI.encode(query))}"
           request do
             if token.is_a?(::OAuth2::AccessToken)
-              token(endpoint).get request_url, headers: headers
+              token(endpoint).get request_url, headers => headers
             else
               token(endpoint).get request_url, headers
             end
@@ -75,7 +75,7 @@ module Dropbox
           request_url = "#{Dropbox::API::Config.prefix}#{path}"
           request do
             if token.is_a?(::OAuth2::AccessToken)
-              token(endpoint).post request_url, params: data, headers: headers
+              token(endpoint).post request_url, params => data, headers => headers
             else
               token(endpoint).post request_url, data, headers
             end
@@ -86,7 +86,7 @@ module Dropbox
           request_url = "#{Dropbox::API::Config.prefix}#{path}"
           request do
             if token.is_a?(::OAuth2::AccessToken)
-              token(endpoint).put request_url, params: data, headers: headers
+              token(endpoint).put request_url, params => data, headers => headers
             else
               token(endpoint).put request_url, data, headers
             end
