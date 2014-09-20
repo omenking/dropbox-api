@@ -12,7 +12,7 @@ module Dropbox
           ::OAuth2::Client.new(Dropbox::API::Config.app_key, Dropbox::API::Config.app_secret,
             :site               => Dropbox::API::Config.endpoints[endpoint],
             :authorize_url      => "#{Dropbox::API::Config.prefix}/oauth2/authorize",
-            :token_url  => "#{Dropbox::API::Config.prefix}/oauth2/token")
+            :token_url          => "#{Dropbox::API::Config.prefix}/oauth2/token")
         end
 
         def access_token(konsumer, options = {})
