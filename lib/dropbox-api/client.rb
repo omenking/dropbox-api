@@ -18,8 +18,7 @@ module Dropbox
       include Dropbox::API::Client::Files
 
       def find(filename)
-        data = self.raw.metadata(:path => filename)
-        data.delete('contents')
+        data = self.raw.metadata(:path => filename, :list => false)
         Dropbox::API::Object.convert(data, self)
       end
 
@@ -38,16 +37,21 @@ module Dropbox
         Dropbox::API::Dir.init(response, self)
       end
 
+      def destroy(path, options = {})
+        response = raw.delete({ :path => path }.merge(options))
+        Dropbox::API::Object.convert(response, self)
+      end
+
       def search(term, options = {})
         options[:path] ||= ''
         results = raw.search({ :query => term }.merge(options))
         Dropbox::API::Object.convert(results, self)
       end
 
-      def delta(cursor=nil)
+      def delta(cursor=nil, options={})
         entries  = []
         has_more = true
-        params   = cursor ? {:cursor => cursor} : {}
+        params   = cursor ? options.merge(:cursor => cursor) : options
         while has_more
           response        = raw.delta(params)
           params[:cursor] = response['cursor']

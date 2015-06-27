@@ -73,9 +73,11 @@ session[:token] = request_token.token
 session[:token_secret] = request_token.secret
 request_token.authorize_url(:oauth_callback => 'http://yoursite.com/callback')
 # Here the user goes to Dropbox, authorizes the app and is redirected
+# This would be typically run in a Rails controller
 hash = { oauth_token: session[:token], oauth_token_secret: session[:token_secret]}
 request_token  = OAuth::RequestToken.from_hash(consumer, hash)
-result = request_token.get_access_token(:oauth_verifier => oauth_token)
+oauth_verifier = params[:oauth_verifier]
+result = request_token.get_access_token(:oauth_verifier => oauth_verifier)
 ```
 
 Now that you have the OAuth1 token and secret, you can create a new instance of the Dropbox::API::Client, like this:
@@ -189,6 +191,16 @@ When provided a path, returns a single file or directory
 client.find 'file.txt' # => #<Dropbox::API::File>
 ```
 
+### Dropbox::API::Client#destroy
+
+Removes the file specified by path
+
+Returns a Dropbox::API::File object of the deleted file
+
+```ruby
+client.destroy 'file.txt' # => #<Dropbox::API::File>
+```
+
 ### Dropbox::API::Client#ls
 
 When provided a path, returns a list of files or directories within that path
@@ -219,6 +231,14 @@ Stores a file with a provided body under a provided name and returns a Dropbox::
 
 ```ruby
 client.upload 'file.txt', 'file body' # => #<Dropbox::API::File>
+```
+
+### Dropbox::API::Client#chunked_upload
+
+Stores a file from a File object under a provided name and returns a Dropbox::API::File object. It should be used for larger files.
+
+```ruby
+client.chunked_upload 'file.txt', File.open('file.txt') # => #<Dropbox::API::File>
 ```
 
 ### Dropbox::API::Client#download
@@ -262,6 +282,15 @@ delta = client.delta 'abc123'
 delta.cursor # => 'abc123'
 delta.entries # => [#<Dropbox::API::File>, #<Dropbox::API::Dir>]
 ```
+
+Optionally, you can set additional parameters, e.g. **path_prefix**. You can find all available parameters in the [Dropbox API documentation](https://www.dropbox.com/developers/core/docs#delta).
+
+```ruby
+delta = client.delta 'abc123', path_prefix: '/Path/To/My/Folder'
+delta.cursor # => 'abc123'
+delta.entries # => [#<Dropbox::API::File>, #<Dropbox::API::Dir>]
+```
+
 
 Dropbox::API::File and Dropbox::API::Dir methods
 ----------------------------

@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "spec_helper"
+require "tempfile"
 
 describe Dropbox::API::Client do
 
@@ -114,6 +115,41 @@ describe Dropbox::API::Client do
     end
   end
 
+  describe "#chunked_upload" do
+
+    before do
+      @size = 5*1024*1024 # 5MB, to test the 4MB chunk size
+      @file = File.open("/tmp/dropbox-api-test", "w") {|f| f.write "a"*@size}
+    end
+
+    it "puts a 5MB file in dropbox" do
+      filename = "#{Dropbox::Spec.test_dir}/test-#{Dropbox::Spec.namespace}.txt"
+      response = @client.chunked_upload filename, File.open("/tmp/dropbox-api-test")
+      response.path.should == filename
+      response.bytes.should == @size
+    end
+
+    after do
+      FileUtils.rm "/tmp/dropbox-api-test"
+    end
+
+  end
+
+  describe "#destroy" do
+
+    before do
+      @client = Dropbox::Spec.instance
+      @filename = "#{Dropbox::Spec.test_dir}/spec-test-#{Time.now.to_i}.txt"
+      @file = @client.upload @filename, "spec file"
+    end
+
+    it "destroys the file properly" do
+      file = @client.destroy(@filename)
+      file.is_deleted.should == true
+    end
+
+  end
+
   describe "#search" do
 
     let(:term) { "searchable-test-#{Dropbox::Spec.namespace}" }
@@ -143,10 +179,10 @@ describe Dropbox::API::Client do
     it "copies a file from a copy_ref" do
       filename = "test/searchable-test-#{Dropbox::Spec.namespace}.txt"
       @client.upload filename, "Some file"
-      response = @client.search "searchable-test-#{Dropbox::Spec.namespace}", :path => 'test'      
+      response = @client.search "searchable-test-#{Dropbox::Spec.namespace}", :path => 'test'
       ref = response.first.copy_ref['copy_ref']
       @client.copy_from_copy_ref ref, "#{filename}.copied"
-      response = @client.search "searchable-test-#{Dropbox::Spec.namespace}.txt.copied", :path => 'test'   
+      response = @client.search "searchable-test-#{Dropbox::Spec.namespace}.txt.copied", :path => 'test'
       response.size.should == 1
       response.first.class.should == Dropbox::API::File
     end
@@ -195,6 +231,28 @@ describe Dropbox::API::Client do
       files.first.is_deleted.should == true
       files.first.path.should == delete_filename
       files.last.path.should == filename
+    end
+
+    context "with extra params" do
+
+      let(:response) do
+        {
+          'cursor' => nil,
+          'has_more' => false,
+          'entries' => []
+        }
+      end
+
+      let(:params) do
+        { :path_prefix => 'my_path' }
+
+      end
+
+      it "passes them to raw delta" do
+        @client.raw.should_receive(:delta).with(params).and_return(response)
+        @client.delta nil, params
+      end
+
     end
   end
 

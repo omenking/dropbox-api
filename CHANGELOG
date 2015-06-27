@@ -1,0 +1,8 @@
+0.4.6
++ Add Dropbox::API::Client#destroy
+0.4.5
++ Add Dropbox::API::Client#chunked_upload
+0.4.4
++ Add Dropbox::API::Dir#hash which returns the dropbox hash
+0.4.3
++ Allow passing of parameters to Dropbox::API::Client#delta

@@ -10,13 +10,23 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/futuresimple/dropbox-api"
   s.summary     = "A Ruby client for the Dropbox REST API."
   s.description = "To deliver a more Rubyesque experience when using the Dropbox API."
+  s.license     = 'MIT'
 
   s.rubyforge_project = "dropbox-api"
 
-  s.add_dependency 'multi_json'
-  s.add_dependency 'oauth'
-  s.add_dependency 'oauth2'
-  s.add_dependency 'hashie'
+  s.add_dependency 'multi_json', '~> 1.10'
+  s.add_dependency 'oauth', '~> 0.4.7'
+  s.add_dependency 'hashie', '~> 3.4.0'
+  s.add_dependency 'oauth2', '~> 1.0'
+
+  s.add_development_dependency 'rspec','2.14.1'
+  s.add_development_dependency 'rake', '10.1.0'
+  s.add_development_dependency 'simplecov', '~> 0.8.2'
+  s.add_development_dependency 'yajl-ruby', '~> 1.2.0'
+
+  if RUBY_VERSION < "1.9"
+    s.add_development_dependency 'ruby-debug19'
+  end
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
