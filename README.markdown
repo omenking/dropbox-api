@@ -92,6 +92,7 @@ consumer = ::Dropbox::API::OAuth2.consumer(:authorize)
 authorize_uri = consumer.authorize_url(client_id: Dropbox::API::Config.app_key, response_type: 'code')
 # Here the user goes to Dropbox, authorizes the app and is redirected, when
 # they return, extract the &code query string parameter
+consumer = ::Dropbox::API::OAuth2.consumer(:main)
 access_token = consumer.auth_code.get_token(params[:code])
 ```
 
