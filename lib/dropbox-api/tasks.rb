@@ -52,15 +52,15 @@ module Dropbox
             Dropbox::API::Config.app_key    = consumer_key
             Dropbox::API::Config.app_secret = consumer_secret
 
-            auth_consumer = ::Dropbox::API::OAuth2.consumer(:authorize)
-            authorize_uri = auth_consumer.authorize_url(client_id: Dropbox::API::Config.app_key, response_type: 'code')
+            authorize_uri = ::Dropbox::API::OAuth2::AuthFlow.start
+
             puts "\nGo to this url and click 'Authorize' to get the token:"
             puts authorize_uri
             print "\nOnce you authorize the app on Dropbox, paste the code here and press enter:"
             code = $stdin.gets.chomp
 
-            main_consumer = ::Dropbox::API::OAuth2.consumer(:main)
-            access_token = main_consumer.auth_code.get_token(code)
+            access_token = ::Dropbox::API::OAuth2::AuthFlow.finish(code)
+
             puts "\nAuthorization complete!:\n\n"
             puts "  Dropbox::API::Config.app_key    = '#{consumer_key}'"
             puts "  Dropbox::API::Config.app_secret = '#{consumer_secret}'"
