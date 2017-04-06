@@ -3,4 +3,3 @@ app_secret: # CONSUMER SECRET
 token:      # ACCESS TOKEN
 secret:     # ACCESS SECRET (for oauth1 only)
 mode:       # 'sandbox' or 'dropbox'
-type:       # 'oauth2' or 'oauth' (default)
