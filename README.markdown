@@ -47,7 +47,6 @@ Dropbox::API::Config.app_key    = YOUR_APP_KEY
 Dropbox::API::Config.app_secret = YOUR_APP_SECRET
 Dropbox::API::Config.mode       = "sandbox" # if you have a single-directory app
 # Dropbox::API::Config.mode       = "dropbox" # if your app has access to the whole dropbox
-Dropbox::API::Config.auth_type  = "oauth" # options are "oauth" or "oauth2" (default is "oauth")
 ```
 
 Dropbox::API::Client
@@ -59,32 +58,9 @@ available in the API.
 Web-based Authorization
 -----------------------
 
-In order to create a Dropbox::API::Client object, you need to have the configuration set up for OAuth.
-Second thing you need is to have the user authorize your app using OAuth. Here's a short intro
+In order to create a Dropbox::API::Client object, you need to have the configuration set up for OAuth2.
+Second thing you need is to have the user authorize your app using OAuth2. Here's a short intro
 on how to do this:
-
-##### OAuth1
-
-```ruby
-consumer = Dropbox::API::OAuth.consumer(:authorize)
-request_token = consumer.get_request_token
-# Store the token and secret so after redirecting we have the same request token
-session[:token] = request_token.token
-session[:token_secret] = request_token.secret
-request_token.authorize_url(:oauth_callback => 'http://yoursite.com/callback')
-# Here the user goes to Dropbox, authorizes the app and is redirected
-# This would be typically run in a Rails controller
-hash = { oauth_token: session[:token], oauth_token_secret: session[:token_secret]}
-request_token  = OAuth::RequestToken.from_hash(consumer, hash)
-oauth_verifier = params[:oauth_verifier]
-result = request_token.get_access_token(:oauth_verifier => oauth_verifier)
-```
-
-Now that you have the OAuth1 token and secret, you can create a new instance of the Dropbox::API::Client, like this:
-
-```ruby
-client = Dropbox::API::Client.new :token => result.token, :secret => result.secret
-```
 
 ##### OAuth2
 ```ruby
@@ -115,7 +91,7 @@ require "dropbox-api/tasks"
 Dropbox::API::Tasks.install
 ```
 
-You will notice that you have two new rake tasks - `dropbox:authorize` and `dropbox:authorize_oauth2`
+You will notice that you have one new rake task - `dropbox:authorize`
 
 When you call one of these Rake tasks, it will ask you to provide the app key and app secret. Afterwards it will present you with an authorize url on Dropbox.
 
@@ -128,7 +104,7 @@ What differs this from the Dropbox Ruby SDK?
 
 A few things:
 
-* It's using the ruby oauth gem, instead of reinventing the wheel and implementing OAuth communication
+* It's using the ruby oauth2 gem, instead of reinventing the wheel and implementing OAuth2 communication
 * It treats files and directories as Ruby objects with appropriate classes, on which you can perform operations
 
 Consider the following example which takes all files with names like 'test.txt' and copies them with a suffix '.old'
