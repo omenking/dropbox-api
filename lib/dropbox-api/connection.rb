@@ -15,7 +15,7 @@ module Dropbox
         @consumers = {}
         @tokens    = {}
         Dropbox::API::Config.endpoints.each do |endpoint, url|
-          auth_class = Dropbox::API::Config.auth_type == 'oauth2' ? Dropbox::API::OAuth2 : Dropbox::API::OAuth
+          auth_class = Dropbox::API::OAuth2
           @consumers[endpoint] = auth_class.consumer(endpoint)
           @tokens[endpoint]    = auth_class.access_token(@consumers[endpoint], options)
         end

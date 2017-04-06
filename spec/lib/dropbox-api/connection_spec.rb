@@ -112,11 +112,7 @@ describe Dropbox::API::Connection do
   describe "#consumer" do
 
     it "returns an appropriate consumer object" do
-      if Dropbox::API::Config.auth_type == 'oauth2'
-        @connection.consumer(:main).should be_a(::OAuth2::Client)
-      else
-        @connection.consumer(:main).should be_a(::OAuth::Consumer)
-      end
+      @connection.consumer(:main).should be_a(::OAuth2::Client)
     end
 
   end

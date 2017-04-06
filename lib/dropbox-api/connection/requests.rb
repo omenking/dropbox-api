@@ -57,11 +57,7 @@ module Dropbox
           query = Dropbox::API::Util.query(data)
           request_url = "#{Dropbox::API::Config.prefix}#{path}?#{URI.parse(URI.encode(query))}"
           request(:raw => true) do
-            if token.is_a?(::OAuth2::AccessToken)
-              token(endpoint).get request_url, :headers => headers, :raise_errors => false
-            else
-              token(endpoint).get request_url, headers
-            end
+            token(endpoint).get request_url, :headers => headers, :raise_errors => false
           end
         end
 
@@ -69,33 +65,21 @@ module Dropbox
           query = Dropbox::API::Util.query(data)
           request_url = "#{Dropbox::API::Config.prefix}#{path}?#{URI.parse(URI.encode(query))}"
           request do
-            if token.is_a?(::OAuth2::AccessToken)
-              token(endpoint).get request_url, :headers => headers, :raise_errors => false
-            else
-              token(endpoint).get request_url, headers
-            end
+            token(endpoint).get request_url, :headers => headers, :raise_errors => false
           end
         end
 
         def post(endpoint, path, data = {}, headers = {})
           request_url = "#{Dropbox::API::Config.prefix}#{path}"
           request do
-            if token.is_a?(::OAuth2::AccessToken)
-              token(endpoint).post request_url, :body => data, :headers => headers, :raise_errors => false
-            else
-              token(endpoint).post request_url, data, headers
-            end
+            token(endpoint).post request_url, :body => data, :headers => headers, :raise_errors => false
           end
         end
 
         def put(endpoint, path, data = {}, headers = {})
           request_url = "#{Dropbox::API::Config.prefix}#{path}"
           request do
-            if token.is_a?(::OAuth2::AccessToken)
-              token(endpoint).put request_url, :body => data, :headers => headers, :raise_errors => false
-            else
-              token(endpoint).put request_url, data, headers
-            end
+            token(endpoint).put request_url, :body => data, :headers => headers, :raise_errors => false
           end
         end
 

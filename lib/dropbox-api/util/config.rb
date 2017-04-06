@@ -9,7 +9,6 @@ module Dropbox
         attr_accessor :app_key
         attr_accessor :app_secret
         attr_accessor :mode
-        attr_accessor :auth_type
       end
 
       self.endpoints = {
@@ -21,7 +20,6 @@ module Dropbox
       self.app_key    = nil
       self.app_secret = nil
       self.mode       = 'sandbox'
-      self.auth_type  = 'oauth'
 
     end
 
