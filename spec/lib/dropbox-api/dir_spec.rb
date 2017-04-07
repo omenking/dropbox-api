@@ -49,7 +49,6 @@ describe Dropbox::API::Dir do
 
       it "destroys the dir properly" do
         @dir.destroy
-        @dir.is_deleted.should == true
       end
 
     end

@@ -70,7 +70,7 @@ module Dropbox
 
         private
 
-        def do_request(method, endpoint, path, data = {}, headers = {})
+        def do_request(method, endpoint, path, data = "", headers = {})
           headers["Content-Type"] ||= "application/json"
           request_url = "#{Dropbox::API::Config.prefix}#{path}"
           request do

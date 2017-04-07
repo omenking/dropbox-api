@@ -11,7 +11,7 @@ module Dropbox
       end
 
       def self.resolve_class(hash)
-        hash['is_dir'] == true ? Dropbox::API::Dir : Dropbox::API::File
+        hash['.tag'] == 'folder' ? Dropbox::API::Dir : Dropbox::API::File
       end
 
       def self.convert(array_or_object, client)

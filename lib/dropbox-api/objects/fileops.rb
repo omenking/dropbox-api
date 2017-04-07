@@ -19,7 +19,7 @@ module Dropbox
       end
 
       def path
-        self['path'].sub(/^\//, '')
+        self['path_lower']
       end
 
       def share_url(options = {})

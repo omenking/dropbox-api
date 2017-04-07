@@ -7,7 +7,7 @@ module Dropbox
 
       def ls(path_to_list = '')
         data = client.raw.metadata :path => path + path_to_list
-        if data['is_dir']
+        if data['.tag'] == 'folder'
           Dropbox::API::Object.convert(data.delete('contents') || [], client)
         else
           [Dropbox::API::Object.convert(data, client)]
