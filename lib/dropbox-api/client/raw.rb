@@ -33,9 +33,6 @@ module Dropbox
         "/sharing/create_shared_link_with_settings", :as => 'shares'
       add_method :post, "/files/get_temporary_link", :as => 'media'
 
-      add_method :get_raw,
-        "/thumbnails/:root/:path",                   :as => 'thumbnails', :endpoint => :content
-
       add_method :post, "/files/copy",               :as => "copy"
       add_method :post, "/files/copy_reference/get", :as => 'copy_ref'
       add_method :post, "/files/create_folder",      :as => "create_folder"

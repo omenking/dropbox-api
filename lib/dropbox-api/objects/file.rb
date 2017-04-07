@@ -16,7 +16,12 @@ module Dropbox
       end
 
       def thumbnail(options = {})
-        client.raw.thumbnails({ :path => self.path }.merge(options))
+        path     = Dropbox::API::Util.escape(self.path)
+        url      = ['', "files", "get_thumbnail"].compact.join('/')
+        api_args = { :path => path }.merge(options)
+        client.connection.get_raw(:content, url, nil, {
+          "Dropbox-API-Arg" => ::JSON.dump(api_args)
+        })
       end
 
       def copy_ref(options = {})
