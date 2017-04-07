@@ -1,3 +1,5 @@
+require 'json'
+
 module Dropbox
   module API
 
@@ -6,20 +8,22 @@ module Dropbox
       module Files
 
         def download(path, options = {})
-          root     = options.delete(:root) || Dropbox::API::Config.mode
           path     = Dropbox::API::Util.escape(path)
-          url      = ['', "files", root, path].compact.join('/')
-          connection.get_raw(:content, url)
+          url      = ['', "files", "download"].compact.join('/')
+          api_args = { :path => path }
+          connection.get_raw(:content, url, nil, {
+            "Dropbox-API-Arg" => ::JSON.dump(api_args)
+          })
         end
 
         def upload(path, data, options = {})
-          root     = options.delete(:root) || Dropbox::API::Config.mode
-          query    = Dropbox::API::Util.query(options)
           path     = Dropbox::API::Util.escape(path)
-          url      = ['', "files_put", root, path].compact.join('/')
-          response = connection.put(:content, "#{url}?#{query}", data, {
-            'Content-Type'   => "application/octet-stream",
-            "Content-Length" => data.length.to_s
+          url      = ['', "files", "upload"].compact.join('/')
+          api_args = { :path => path, :mode => "overwrite" }.merge(options)
+          response = connection.post_raw(:content, url, data, {
+            'Content-Type'    => "application/octet-stream",
+            "Content-Length"  => data.length.to_s,
+            "Dropbox-API-Arg" => ::JSON.dump(api_args)
           })
           Dropbox::API::File.init(response, self)
         end
@@ -74,4 +78,3 @@ module Dropbox
 
   end
 end
-

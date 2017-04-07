@@ -13,7 +13,7 @@ module Dropbox
 
       self.endpoints = {
         :main      => "https://api.dropboxapi.com",
-        :content   => "https://api-content.dropbox.com",
+        :content   => "https://content.dropboxapi.com",
         :authorize => "https://www.dropbox.com"
       }
       self.prefix     = "/2"

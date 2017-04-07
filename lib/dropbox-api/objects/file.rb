@@ -7,7 +7,7 @@ module Dropbox
 
       def revisions(options = {})
         response = client.raw.revisions({ :path => self.path }.merge(options))
-        Dropbox::API::Object.convert(response, client)
+        Dropbox::API::Object.convert(response["entries"], client)
       end
 
       def restore(rev, options = {})
@@ -18,12 +18,12 @@ module Dropbox
       def thumbnail(options = {})
         client.raw.thumbnails({ :path => self.path }.merge(options))
       end
-      
+
       def copy_ref(options = {})
         response = client.raw.copy_ref({ :path => self.path }.merge(options))
         Dropbox::API::Object.init(response, client)
       end
-      
+
       def download
         client.download(self.path)
       end

@@ -36,7 +36,8 @@ describe Dropbox::API::File do
 
     it "destroys the file properly" do
       @file.destroy
-      @file.is_deleted.should == true
+      response = @client.raw.metadata(:path => @file.path, :include_deleted => true)
+      response[".tag"].should == 'deleted'
     end
 
   end
@@ -85,7 +86,7 @@ describe Dropbox::API::File do
 
       result = @file.share_url
       result.should be_an_instance_of(Dropbox::API::Object)
-      result.keys.sort.should == ['expires', 'url', 'visibility']
+      result.keys.sort.should == ['.tag', 'client_modified', 'id', 'link_permissions', 'name', 'path_lower', 'rev', 'server_modified', 'size', 'url']
 
     end
 
@@ -97,7 +98,7 @@ describe Dropbox::API::File do
 
       result = @file.copy_ref
       result.should be_an_instance_of(Dropbox::API::Object)
-      result.keys.sort.should == ['copy_ref', 'expires']
+      result.keys.sort.should == ['copy_reference', 'expires', 'metadata']
 
     end
 
@@ -109,7 +110,7 @@ describe Dropbox::API::File do
 
       result = @file.direct_url
       result.should be_an_instance_of(Dropbox::API::Object)
-      result.keys.sort.should == ['expires', 'url']
+      result.keys.sort.should == ['link', 'metadata']
 
     end
 

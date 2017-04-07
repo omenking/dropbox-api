@@ -48,20 +48,27 @@ module Dropbox
           end
         end
 
-        def get_raw(endpoint, path, data = {}, headers = {})
-          headers["Content-Type"] ||= "application/json"
-          request_url = "#{Dropbox::API::Config.prefix}#{path}"
-          request(:raw => true) do
-            token(endpoint).get request_url, :body => ::JSON.dump(data), :headers => headers, :raise_errors => false
-          end
-        end
-
         def get(endpoint, path, data = {}, headers = {})
           do_request :get, endpoint, path, data, headers
         end
 
+        def get_raw(endpoint, path, data = {}, headers = {})
+          headers["Content-Type"] = ""
+          request_url = "#{Dropbox::API::Config.prefix}#{path}"
+          request(:raw => true) do
+            token(endpoint).get request_url, :body => "", :headers => headers, :raise_errors => false
+          end
+        end
+
         def post(endpoint, path, data = {}, headers = {})
           do_request :post, endpoint, path, data, headers
+        end
+
+        def post_raw(endpoint, path, data = "", headers = {})
+          request_url = "#{Dropbox::API::Config.prefix}#{path}"
+          request do
+            token(endpoint).post request_url, :body => data, :headers => headers, :raise_errors => false
+          end
         end
 
         def put(endpoint, path, data = {}, headers = {})
