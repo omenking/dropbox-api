@@ -22,7 +22,8 @@ module Dropbox
         connection.send(method, endpoint, action, data)
       end
 
-      add_method :get,  "/account/info",             :as => 'account', :root => false
+      add_method :post,
+        "/users/get_current_account",                :as => 'account', :root => false
 
       add_method :post, "/files/get_metadata",       :as => 'metadata'
       add_method :post, "/delta",                    :as => 'delta',   :root => false
