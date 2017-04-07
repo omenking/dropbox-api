@@ -96,22 +96,22 @@ describe Dropbox::API::Client do
     it "puts the file in dropbox" do
       filename = "#{Dropbox::Spec.test_dir}/test-#{Dropbox::Spec.namespace}.txt"
       response = @client.upload filename, "Some file"
-      response.path.should == filename
-      response.bytes.should == 9
+      response.path_display.should == filename
+      response.size.should == 9
     end
 
     it "uploads the file with tricky characters" do
       filename = "#{Dropbox::Spec.test_dir}/test ,|!@\#$%^&*{b}[].;'.,<>?:-#{Dropbox::Spec.namespace}.txt"
       response = @client.upload filename, "Some file"
-      response.path.should == filename
-      response.bytes.should == 9
+      response.path_display.should == Dropbox::API::Util.escape(filename)
+      response.size.should == 9
     end
 
     it "uploads the file with utf8" do
       filename = "#{Dropbox::Spec.test_dir}/test łołąó-#{Dropbox::Spec.namespace}.txt"
       response = @client.upload filename, "Some file"
-      response.path.should == filename
-      response.bytes.should == 9
+      response.path_display.should == Dropbox::API::Util.escape(filename)
+      response.size.should == 9
     end
   end
 
@@ -145,7 +145,8 @@ describe Dropbox::API::Client do
 
     it "destroys the file properly" do
       file = @client.destroy(@filename)
-      file.is_deleted.should == true
+      response = @client.raw.metadata(:path => file.path, :include_deleted => true)
+      response[".tag"].should == 'deleted'
     end
 
   end
