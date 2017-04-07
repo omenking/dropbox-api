@@ -1,3 +1,5 @@
+require 'json'
+
 module Dropbox
   module API
 
@@ -11,21 +13,14 @@ module Dropbox
           status = (response.respond_to?(:code) ? response.code : response.status).to_i
           case status
             when 400
-              parsed = MultiJson.decode(response.body)
-              raise Dropbox::API::Error::BadInput.new("400 - Bad input parameter - #{parsed['error']}")
+              raise Dropbox::API::Error::BadInput.new("400 - Bad input parameter - #{response.body}")
             when 401
               raise Dropbox::API::Error::Unauthorized.new("401 - Bad or expired token")
-            when 403
-              parsed = MultiJson.decode(response.body)
-              raise Dropbox::API::Error::Forbidden.new('403 - Bad OAuth request')
             when 404
               raise Dropbox::API::Error::NotFound.new("404 - Not found")
-            when 405
+            when 409
               parsed = MultiJson.decode(response.body)
-              raise Dropbox::API::Error::WrongMethod.new("405 - Request method not expected - #{parsed['error']}")
-            when 406
-              parsed = MultiJson.decode(response.body)
-              raise Dropbox::API::Error.new("#{status} - #{parsed['error']}")
+              raise Dropbox::API::Error.new("409 - #{parsed['error_summary']}")
             when 429
               raise Dropbox::API::Error::RateLimit.new('429 - Rate Limiting in affect')
             when 300..399
@@ -54,32 +49,32 @@ module Dropbox
         end
 
         def get_raw(endpoint, path, data = {}, headers = {})
-          query = Dropbox::API::Util.query(data)
-          request_url = "#{Dropbox::API::Config.prefix}#{path}?#{URI.parse(URI.encode(query))}"
+          headers["Content-Type"] ||= "application/json"
+          request_url = "#{Dropbox::API::Config.prefix}#{path}"
           request(:raw => true) do
-            token(endpoint).get request_url, :headers => headers, :raise_errors => false
+            token(endpoint).get request_url, :body => ::JSON.dump(data), :headers => headers, :raise_errors => false
           end
         end
 
         def get(endpoint, path, data = {}, headers = {})
-          query = Dropbox::API::Util.query(data)
-          request_url = "#{Dropbox::API::Config.prefix}#{path}?#{URI.parse(URI.encode(query))}"
-          request do
-            token(endpoint).get request_url, :headers => headers, :raise_errors => false
-          end
+          do_request :get, endpoint, path, data, headers
         end
 
         def post(endpoint, path, data = {}, headers = {})
-          request_url = "#{Dropbox::API::Config.prefix}#{path}"
-          request do
-            token(endpoint).post request_url, :body => data, :headers => headers, :raise_errors => false
-          end
+          do_request :post, endpoint, path, data, headers
         end
 
         def put(endpoint, path, data = {}, headers = {})
+          do_request :put, endpoint, path, data, headers
+        end
+
+        private
+
+        def do_request(method, endpoint, path, data = {}, headers = {})
+          headers["Content-Type"] ||= "application/json"
           request_url = "#{Dropbox::API::Config.prefix}#{path}"
           request do
-            token(endpoint).put request_url, :body => data, :headers => headers, :raise_errors => false
+            token(endpoint).send method, request_url, :body => ::JSON.dump(data), :headers => headers, :raise_errors => false
           end
         end
 

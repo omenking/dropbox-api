@@ -22,25 +22,11 @@ describe Dropbox::API::Connection do
       end.should raise_error(Dropbox::API::Error::Unauthorized, '401 - Bad or expired token')
     end
 
-    it "raises a Dropbox::API::Error::Forbidden when the response is a 403" do
-      response = double :code => 403, :body => '{ "a":1}'
-      lambda do
-        @connection.request { response }
-      end.should raise_error(Dropbox::API::Error::Forbidden, '403 - Bad OAuth request')
-    end
-
     it "raises a Dropbox::API::Error::NotFound when the response is a 404" do
       response = double :code => 404, :body => '{ "a":1}'
       lambda do
         @connection.request { response }
       end.should raise_error(Dropbox::API::Error::NotFound, '404 - Not found')
-    end
-
-    it "raises a Dropbox::API::Error::WrongMethod when the response is a 405" do
-      response = double :code => 405, :body => '{ "error": "The requested method GET is not allowed for the URL /foo/." }'
-      lambda do
-        @connection.request { response }
-      end.should raise_error(Dropbox::API::Error::WrongMethod, '405 - Request method not expected - The requested method GET is not allowed for the URL /foo/.')
     end
 
     it "raises a Dropbox::API::Error when the response is a 3xx" do
@@ -58,17 +44,10 @@ describe Dropbox::API::Connection do
     end
 
     it "raises a Dropbox::API::Error when the response is a 400" do
-      response = double :code => 400, :body => '{ "error": "bad request foo" }'
+      response = double :code => 400, :body => 'bad request foo'
       lambda do
         @connection.request { response }
       end.should raise_error(Dropbox::API::Error::BadInput, '400 - Bad input parameter - bad request foo')
-    end
-
-    it "raises a Dropbox::API::Error when the response is a 406" do
-      response = double :code => 406, :body => '{ "error": "bad request bar" }'
-      lambda do
-        @connection.request { response }
-      end.should raise_error(Dropbox::API::Error, '406 - bad request bar')
     end
 
     it "raises a Dropbox::API::Error when the response is a 406" do
