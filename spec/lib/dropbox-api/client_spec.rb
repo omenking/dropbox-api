@@ -198,12 +198,6 @@ describe Dropbox::API::Client do
       file.should == "Some file"
     end
 
-    it "raises a 404 when a file is not found in Dropbox" do
-      lambda {
-        @client.download "#{Dropbox::Spec.test_dir}/no.txt"
-      }.should raise_error(Dropbox::API::Error::NotFound)
-    end
-
   end
 
   describe "#delta" do

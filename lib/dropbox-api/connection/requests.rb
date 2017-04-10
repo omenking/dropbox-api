@@ -16,8 +16,6 @@ module Dropbox
               raise Dropbox::API::Error::BadInput.new("400 - Bad input parameter - #{response.body}")
             when 401
               raise Dropbox::API::Error::Unauthorized.new("401 - Bad or expired token")
-            when 404
-              raise Dropbox::API::Error::NotFound.new("404 - Not found")
             when 409
               parsed = MultiJson.decode(response.body)
               raise Dropbox::API::Error.new("409 - #{parsed['error_summary']}")
