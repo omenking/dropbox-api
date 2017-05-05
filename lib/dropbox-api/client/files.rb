@@ -17,7 +17,6 @@ module Dropbox
         end
 
         def upload(path, data, options = {})
-          path     = Dropbox::API::Util.escape(path)
           url      = ['', "files", "upload"].compact.join('/')
           api_args = { :path => path, :mode => "overwrite" }.merge(options)
           response = connection.post_raw(:content, url, data, {
