@@ -1,4 +1,3 @@
-require 'pry'
 module Dropbox
   module API
     class Dir < Dropbox::API::Object

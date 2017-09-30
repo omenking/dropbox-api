@@ -1,4 +1,3 @@
-require 'pry'
 require "dropbox-api/client/raw"
 require "dropbox-api/client/files"
 
