@@ -15,7 +15,7 @@ module Dropbox
 
       def destroy(options = {})
         response = client.raw.delete({ :path => self.path }.merge(options))
-        self.update response
+        self.deleted = false
       end
 
       def path
@@ -24,7 +24,7 @@ module Dropbox
 
       def share_url(options = {})
         response = client.raw.shares({ :path => self.path }.merge(options))
-        Dropbox::API::Object.init(response, client)
+        Dropbox::API::Object.new(response, client)
       end
 
     end

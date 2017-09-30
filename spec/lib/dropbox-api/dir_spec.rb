@@ -6,17 +6,6 @@ describe Dropbox::API::Dir do
     # @dir.delete
   end
 
-  describe "#hash" do
-
-    let(:hash) { "dasdsaf32da" }
-
-    it "returns the hash from Dropbox" do
-      dir = Dropbox::API::Dir.new("hash" => hash)
-      dir.hash.should == hash
-    end
-
-  end
-
   context "operations" do
 
     before do

@@ -1,26 +1,25 @@
 module Dropbox
   module API
 
-    class Object < Hashie::Mash
-      attr_accessor :client
+    class Object
+      attr_accessor :client, :deleted
 
-      def self.init(response, client)
-        instance = self.new(response)
-        instance.client = client
-        instance
+      def initialize(response, client)
+        self.deleted = false
+        self.client  = client
       end
 
       def self.resolve_class(hash)
         hash['.tag'] == 'folder' ? Dropbox::API::Dir : Dropbox::API::File
       end
 
-      def self.convert(array_or_object, client)
-        if array_or_object.is_a?(Array)
-          array_or_object.collect do |item|
-            resolve_class(item).init(item, client)
+      def self.convert(result, client)
+        if result.is_a?(Array)
+          result.map do |item|
+            resolve_class(item).new(item, client)
           end
         else
-          resolve_class(array_or_object).init(array_or_object, client)
+          resolve_class(result).new(result,client)
         end
       end
 
@@ -31,6 +30,10 @@ module Dropbox
           regular_writer(key, convert_value(v, true))
         end
         self
+      end
+
+      def is_deleted?
+        self.deleted
       end
 
     end

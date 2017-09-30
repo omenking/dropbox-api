@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "dropbox-api"
 
   s.add_dependency 'multi_json', '~> 1.10'
-  s.add_dependency 'hashie', '~> 3.4.0'
+  s.add_dependency 'hashie', '~> 3.5.6'
   s.add_dependency 'oauth2', '~> 1.0'
 
   s.add_development_dependency 'rspec','2.14.1'
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'simplecov', '~> 0.8.2'
   s.add_development_dependency 'yajl-ruby', '~> 1.2.0'
 
+  s.add_development_dependency 'pry'
   if RUBY_VERSION < "1.9"
     s.add_development_dependency 'ruby-debug19'
   end

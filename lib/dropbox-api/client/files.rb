@@ -8,9 +8,9 @@ module Dropbox
       module Files
 
         def download(path, options = {})
-          path     = Dropbox::API::Util.escape(path)
+          path     = path
           url      = ['', "files", "download"].compact.join('/')
-          api_args = { :path => path }
+          api_args = { path: path }
           connection.get_raw(:content, url, nil, {
             "Dropbox-API-Arg" => ::JSON.dump(api_args)
           })
@@ -18,50 +18,66 @@ module Dropbox
 
         def upload(path, data, options = {})
           url      = ['', "files", "upload"].compact.join('/')
-          api_args = { :path => path, :mode => "overwrite" }.merge(options)
+          api_args = { path: path, mode: "overwrite" }.merge(options)
           response = connection.post_raw(:content, url, data, {
             'Content-Type'    => "application/octet-stream",
             "Content-Length"  => data.length.to_s,
             "Dropbox-API-Arg" => ::JSON.dump(api_args)
           })
-          Dropbox::API::File.init(response, self)
+          Dropbox::API::File.new(response, self)
         end
 
         def chunked_upload(path, file, options = {})
-          root     = options.delete(:root) || Dropbox::API::Config.mode
-          path     = Dropbox::API::Util.escape(path)
-          upload_url = '/chunked_upload'
-          commit_url = ['', "commit_chunked_upload", root, path].compact.join('/')
 
           total_file_size = ::File.size(file)
-          chunk_size = options[:chunk_size] || 4*1024*1024 # default 4 MB chunk size
-          offset = options[:offset] || 0
-          upload_id = options[:upload_id]
+          chunk_size      = options[:chunk_size] || 4*1024*1024 # default 4 MB chunk size
+          offset          = options[:offset] || 0
+          session_id      = nil
+          api_args        = { path: path, mode: 'overwrite' }.merge(options)
 
           while offset < total_file_size
-            data = file.read(chunk_size)
+            data = file.read chunk_size
 
-            query    = Dropbox::API::Util.query(options.merge(:offset => offset))
-            response = connection.put(:content, "#{upload_url}?#{query}", data, {
-              'Content-Type'   => "application/octet-stream",
-              "Content-Length" => data.length.to_s
-            })
-
-            upload = Dropbox::API::Object.init(response, self)
-            options[:upload_id] ||= upload[:upload_id]
-            offset += upload[:offset].to_i - offset if upload[:offset] && upload[:offset].to_i > offset
-            yield offset, upload if block_given?
+            puts "path: #{path} / offset: #{offset} / len #{data.length} / tot: #{total_file_size}"
+            if (offset.zero?)
+              response = connection.post :content,
+                '/files/upload_session/start', data,
+                'Content-Type'   => "application/octet-stream",
+                "Content-Length" => data.length.to_s
+              session_id = response['session_id']
+            else
+              attrs = {
+                cursor: {
+                  offset: offset,
+                  session_id: session_id
+                }
+              }
+              query    = Dropbox::API::Util.query options.merge(attrs)
+              response = connection.post :content,
+                '/files/upload_session/append_v2', data,
+                'Content-Type'   => "application/octet-stream",
+                "Content-Length" => data.length.to_s,
+                "Dropbox-API-Arg" => ::JSON.dump(attrs)
+            end
+            offset = offset + (data.length-1)
           end
 
 
-          query = Dropbox::API::Util.query({:upload_id => options[:upload_id]})
-
-          response = connection.post(:content, "#{commit_url}?#{query}", "", {
+          attrs = {
+            cursor: {
+              offset: offset,
+              session_id: session_id
+            }
+          }
+          root     = options.delete(:root) || Dropbox::API::Config.mode
+          commit_url = ['', "files/upload_session/finish", root, path].compact.join('/')
+          response = connection.post :content, commit_url, "", {
             'Content-Type'   => "application/octet-stream",
-            "Content-Length" => "0"
-          })
+            "Content-Length" => "0",
+            "Dropbox-API-Arg" => ::JSON.dump(attrs)
+          }
 
-          Dropbox::API::File.init(response, self)
+          Dropbox::API::File.new(response, self)
         end
 
         def copy_from_copy_ref(copy_ref, to, options = {})
