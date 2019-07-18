@@ -27,9 +27,36 @@ module Dropbox
         self.id           = response['id']
       end
 
+      def ls_all path_to_list = ''
+        entries = []
+        data = ls path_to_list
+        entries.concat data['entries']
+        if data['has_more']
+          has_more   = true
+          cursor    = data['cursor']
+          i         = 0
+          # should quit after 25 (100 files) attempts or pagination ends.
+          while has_more do
+            paginate_data = continue(cursor)
+            entries.concat paginate_data['entries']
+            has_more  = paginate_data['has_more'] || i == 25
+            cursor    = paginate_data['cursor']
+            i         = i +1
+          end
+        end
+        entries
+      end
+
       def ls(path_to_list = '')
         data = client.raw.ls path: self.path + path_to_list
-        Dropbox::API::Object.convert data['entries'] || [], client
+        data['entries'] = Dropbox::API::Object.convert(data['entries'] || {}, client)
+        data
+      end
+
+      def continue cursor
+        data = client.raw.continue cursor: cursor
+        data['entries'] = Dropbox::API::Object.convert(data['entries'] || {}, client)
+        data
       end
 
       def direct_url(options = {})

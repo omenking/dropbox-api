@@ -26,6 +26,14 @@ module Dropbox
         Dropbox::API::Dir.new({path: path}, self).ls
       end
 
+      def continue(cursor)
+        Dropbox::API::Dir.new({}, self).continue(cursor)
+      end
+
+      def ls_all(path='')
+        Dropbox::API::Dir.new({path: path}, self).ls_all
+      end
+
       def account
         Dropbox::API::Account.new(self.raw.account, self)
       end

@@ -24,6 +24,7 @@ module Dropbox
 
       add_method :post, '/users/get_current_account'               , as: 'account', root: false
       add_method :post, '/files/list_folder'                       , as: 'ls'
+      add_method :post, '/files/list_folder/continue'              , as: 'continue'
       add_method :post, '/files/get_metadata'                      , as: 'metadata'
       add_method :post, '/delta'                                   , as: 'delta', root: false
       add_method :post, '/files/list_revisions'                    , as: 'revisions'
